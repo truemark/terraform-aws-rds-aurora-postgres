@@ -68,6 +68,7 @@ module "db" {
   create_random_password = var.password == null
   password = var.password
   create_security_group = var.create_security_group
+  snapshot_identifier = var.snapshot_identifier
 }
 
 resource "aws_ram_resource_share" "db" {
@@ -75,24 +76,6 @@ resource "aws_ram_resource_share" "db" {
   name = "${var.name}-rds"
   allow_external_principals = false
   tags = merge(var.tags, var.share_tags)
-}
-
-resource "aws_route53_record" "db_writer" {
-  count = var.create_cluster && var.writer_dns_name != null && var.zone_id != null ? 1 : 0
-  name = var.writer_dns_name
-  zone_id = var.zone_id
-  type = "CNAME"
-  ttl = "60"
-  records = [module.db.this_rds_cluster_endpoint]
-}
-
-resource "aws_route53_record" "db_reader" {
-  count = var.create_cluster && var.reader_dns_name != null && var.zone_id != null && var.replica_scale_enabled ? 1 : 0
-  name = var.reader_dns_name
-  zone_id = var.zone_id
-  type = "CNAME"
-  ttl = "60"
-  records = [module.db.this_rds_cluster_reader_endpoint]
 }
 
 resource "aws_ssm_parameter" "db" {

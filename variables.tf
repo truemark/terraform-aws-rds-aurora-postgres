@@ -229,19 +229,6 @@ variable "deletion_protection" {
   default = false
 }
 
-variable "zone_id" {
-  description = "If populated, will create a Route 53 DNS records for the endpoints"
-  default = null
-}
-
-variable "reader_dns_name" {
-  default = null
-}
-
-variable "writer_dns_name" {
-  default = null
-}
-
 variable "share" {
   default = false
   type = bool
@@ -282,4 +269,10 @@ variable "proxy_secret_arns" {
   description = "List of AWS Secret ARNs containing credentials for use by the proxy."
   type = list(string)
   default = []
+}
+
+variable "snapshot_identifier" {
+  description = "DB snapshot to create this database from"
+  type        = string
+  default     = null
 }
