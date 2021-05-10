@@ -276,3 +276,9 @@ variable "snapshot_identifier" {
   type        = string
   default     = null
 }
+
+variable "kms_key_id" {
+  description = "KMS Key used to encrypt RDS instance"
+  type = string
+  default = null
+}

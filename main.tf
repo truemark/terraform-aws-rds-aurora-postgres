@@ -69,6 +69,7 @@ module "db" {
   password = var.password
   create_security_group = var.create_security_group
   snapshot_identifier = var.snapshot_identifier
+  kms_key_id = var.kms_key_id
 }
 
 resource "aws_ram_resource_share" "db" {
