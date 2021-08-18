@@ -226,6 +226,7 @@ variable "preferred_maintenance_window" {
 }
 
 variable "deletion_protection" {
+  description = "TEST"
   default = false
 }
 
