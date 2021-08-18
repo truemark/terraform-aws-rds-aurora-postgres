@@ -26,11 +26,13 @@ variable "password" {
 }
 
 variable "store_master_password_as_parameter" {
+  description = ""
   default = false
   type = bool
 }
 
 variable "master_password_ssm_parameter_name" {
+  description = ""
   default = null
 }
 
@@ -41,11 +43,13 @@ variable "master_password_ssm_parameter_tags" {
 }
 
 variable "store_master_password_as_secret" {
+  description = ""
   default = true
   type = bool
 }
 
 variable "master_password_secret_name_prefix" {
+  description = ""
   default = null
 }
 
@@ -231,6 +235,7 @@ variable "deletion_protection" {
 }
 
 variable "share" {
+  description = ""
   default = false
   type = bool
 }
@@ -242,21 +247,25 @@ variable "share_tags" {
 }
 
 variable "create_proxy" {
+  description = ""
   default = false
   type = bool
 }
 
 variable "proxy_debug_logging" {
+  description = ""
   default = false
   type = bool
 }
 
 variable "proxy_idle_client_timeout" {
+  description = ""
   default = 1800
   type = number
 }
 
 variable "proxy_require_tls" {
+  description = ""
   default = true
   type = bool
 }
