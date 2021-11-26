@@ -20,24 +20,14 @@ variable "create_cluster" {
   default = true
 }
 
-variable "password" {
-  description = "The master database password. If null a random one is generated."
+variable "master_password" {
+  description = "Password for the master user. If null, a random one is generated."
   default = null
 }
 
-variable "store_master_password_as_parameter" {
-  default = false
-  type = bool
-}
-
-variable "master_password_ssm_parameter_name" {
-  default = null
-}
-
-variable "master_password_ssm_parameter_tags" {
-  description = "Additional tags for the SSM parameter"
-  type        = map(string)
-  default     = {}
+variable "master_username" {
+  description = "Username for the master user."
+  default = "root"
 }
 
 variable "store_master_password_as_secret" {
@@ -81,7 +71,7 @@ variable "subnets" {
 
 variable "family" {
   description = "The database family"
-  default = "aurora-postgresql11"
+  default = "aurora-postgresql12"
 }
 
 variable "db_parameter_group_name" {
@@ -91,8 +81,12 @@ variable "db_parameter_group_name" {
 
 variable "db_parameters" {
   description = "Map of parameters to use in the aws_db_parameter_group resource"
-  type = map(string)
-  default = {}
+  type = list(object({
+    name = string
+    value = string
+    apply_method = string
+  }))
+  default = []
 }
 
 variable "db_parameter_group_tags" {
@@ -107,8 +101,12 @@ variable "rds_cluster_parameter_group_name" {
 
 variable "rds_cluster_parameters" {
   description = "Map of the parameters to use in the aws_rds_cluster_parameter_group resource"
-  type = map(string)
-  default = {}
+  type = list(object({
+    name = string
+    value = string
+    apply_method = string
+  }))
+  default = []
 }
 
 variable "rds_cluster_parameter_group_tags" {
@@ -125,68 +123,19 @@ variable "database_name" {
 variable "engine_version" {
   description = "Aurora database engine version."
   type        = string
-  default     = "11.9" # max version supporting proxy
+  default     = "12.8" # max version supporting proxy
 }
 
-variable "instance_type_replica" {
-  description = "Instance type to use at replica instance"
-  type        = string
-  default     = null
-}
-
-variable "instance_type" {
+variable "instance_class" {
   description = "Instance type to use at master instance. If instance_type_replica is not set it will use the same type for replica instances"
   type        = string
-  default     = "db.r4.large"
-}
-
-variable "replica_scale_enabled" {
-  description = "Whether to enable autoscaling for RDS Aurora read replicas"
-  type        = bool
-  default     = true
+  default     = "db.r6g.large"
 }
 
 variable "replica_count" {
-  description = "Number of reader nodes to create.  If `replica_scale_enable` is `true`, the value of `replica_scale_min` is used instead."
-  type        = number
-  default     = 1
-}
-
-variable "replica_scale_max" {
-  description = "Maximum number of replicas to allow scaling for"
-  type        = number
-  default     = 10
-}
-
-variable "replica_scale_min" {
-  description = "Minimum number of replicas to allow scaling for"
-  type        = number
-  default     = 2
-}
-
-variable "replica_scale_cpu" {
-  description = "CPU usage to trigger autoscaling at"
-  type        = number
-  default     = 60
-}
-
-# See https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Managing.Performance.html
-variable "replica_scale_connections" {
-  description = "Average number of connections to trigger autoscaling at. Default value is 70% of db.r4.large's default max_connections"
-  type        = number
-  default     = 700
-}
-
-variable "replica_scale_in_cooldown" {
-  description = "Cooldown in seconds before allowing further scaling operations after a scale in"
-  type        = number
-  default     = 300
-}
-
-variable "replica_scale_out_cooldown" {
-  description = "Cooldown in seconds before allowing further scaling operations after a scale out"
-  type        = number
-  default     = 300
+  description = "Number of read-only replicas to create."
+  type = number
+  default = 1
 }
 
 variable "apply_immediately" {
@@ -226,6 +175,7 @@ variable "preferred_maintenance_window" {
 }
 
 variable "deletion_protection" {
+  type = bool
   default = false
 }
 
