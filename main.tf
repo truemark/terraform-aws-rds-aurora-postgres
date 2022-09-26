@@ -62,6 +62,8 @@ module "db" {
   db_cluster_parameter_group_name = var.rds_cluster_parameter_group_name == null ? element(aws_rds_cluster_parameter_group.db.*.name, 1) : var.rds_cluster_parameter_group_name
   allowed_cidr_blocks = var.allowed_cidr_blocks
   backup_retention_period = var.backup_retention_period
+  performance_insights_enabled = var.performance_insights_enabled
+  performance_insights_kms_key_id = var.performance_insights_kms_key_id
   preferred_backup_window = var.preferred_backup_window
   preferred_maintenance_window = var.preferred_maintenance_window
   deletion_protection = var.deletion_protection

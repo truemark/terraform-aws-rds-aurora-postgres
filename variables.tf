@@ -162,6 +162,18 @@ variable "backup_retention_period" {
   default     = 7
 }
 
+variable "performance_insights_enabled" {
+  description = "Whether or not to enable performance insights for this db."
+  type        = bool
+  default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  description = "The KMS key to use to encrypt Performance Insights data."
+  type        = string
+  default     = null
+}
+
 variable "preferred_backup_window" {
   description = "When to perform DB backups"
   type        = string
