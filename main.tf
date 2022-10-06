@@ -77,6 +77,7 @@ module "db" {
   create_security_group = var.create_security_group
   snapshot_identifier = var.snapshot_identifier
   kms_key_id = var.kms_key_id
+  auto_minor_version_upgrade = var.auto_minor_version_upgrade
 }
 
 resource "aws_ram_resource_share" "db" {

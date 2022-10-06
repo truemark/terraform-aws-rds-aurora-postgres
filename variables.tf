@@ -244,3 +244,9 @@ variable "kms_key_id" {
   type = string
   default = null
 }
+
+variable "auto_minor_version_upgrade" {
+  description = "Whether or not to allow auto minor version upgrades."
+  type = bool
+  default = false
+}
