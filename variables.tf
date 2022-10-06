@@ -12,27 +12,27 @@ variable "cluster_tags" {
 
 variable "copy_tags_to_snapshot" {
   description = "Copy all cluster tags to snapshots"
-  default = false
+  default     = false
 }
 
 variable "create_cluster" {
   description = "True if the cluster should be created"
-  default = true
+  default     = true
 }
 
 variable "master_password" {
   description = "Password for the master user. If null, a random one is generated."
-  default = null
+  default     = null
 }
 
 variable "master_username" {
   description = "Username for the master user."
-  default = "root"
+  default     = "root"
 }
 
 variable "store_master_password_as_secret" {
   default = true
-  type = bool
+  type    = bool
 }
 
 variable "master_password_secret_name_prefix" {
@@ -47,8 +47,8 @@ variable "password_secret_tags" {
 
 variable "create_security_group" {
   description = "Whether to create the security group for the RDS cluster"
-  default = true
-  type = bool
+  default     = true
+  type        = bool
 }
 
 variable "security_group_tags" {
@@ -71,19 +71,19 @@ variable "subnets" {
 
 variable "family" {
   description = "The database family"
-  default = "aurora-postgresql12"
+  default     = "aurora-postgresql12"
 }
 
 variable "db_parameter_group_name" {
   description = "Optional aws_db_parameter_group name. Providing this will prevent the creation of the aws_db_parameter_group resource."
-  default = null
+  default     = null
 }
 
 variable "db_parameters" {
   description = "Map of parameters to use in the aws_db_parameter_group resource"
   type = list(object({
-    name = string
-    value = string
+    name         = string
+    value        = string
     apply_method = string
   }))
   default = []
@@ -91,19 +91,19 @@ variable "db_parameters" {
 
 variable "db_parameter_group_tags" {
   description = "A map of tags to add to the aws_db_parameter_group resource if one is created."
-  default = {}
+  default     = {}
 }
 
 variable "rds_cluster_parameter_group_name" {
   description = "Optional aws_rds_cluster_parameter_group name. Providing this will prevent the creation of the aws_rds_cluster_parameter_group resource."
-  default = null
+  default     = null
 }
 
 variable "rds_cluster_parameters" {
   description = "Map of the parameters to use in the aws_rds_cluster_parameter_group resource"
   type = list(object({
-    name = string
-    value = string
+    name         = string
+    value        = string
     apply_method = string
   }))
   default = []
@@ -111,7 +111,7 @@ variable "rds_cluster_parameters" {
 
 variable "rds_cluster_parameter_group_tags" {
   description = "A map of tags to add to the aws_rds_cluster_parameter_group resource if one is created."
-  default =  {}
+  default     = {}
 }
 
 variable "database_name" {
@@ -134,8 +134,8 @@ variable "instance_class" {
 
 variable "replica_count" {
   description = "Number of read-only replicas to create."
-  type = number
-  default = 1
+  type        = number
+  default     = 1
 }
 
 variable "apply_immediately" {
@@ -162,6 +162,18 @@ variable "backup_retention_period" {
   default     = 7
 }
 
+variable "performance_insights_enabled" {
+  description = "Whether or not to enable performance insights for this db."
+  type        = bool
+  default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  description = "The KMS key to use to encrypt Performance Insights data."
+  type        = string
+  default     = null
+}
+
 variable "preferred_backup_window" {
   description = "When to perform DB backups"
   type        = string
@@ -175,13 +187,13 @@ variable "preferred_maintenance_window" {
 }
 
 variable "deletion_protection" {
-  type = bool
+  type    = bool
   default = false
 }
 
 variable "share" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "share_tags" {
@@ -192,33 +204,33 @@ variable "share_tags" {
 
 variable "create_proxy" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "proxy_debug_logging" {
   default = false
-  type = bool
+  type    = bool
 }
 
 variable "proxy_idle_client_timeout" {
   default = 1800
-  type = number
+  type    = number
 }
 
 variable "proxy_require_tls" {
   default = true
-  type = bool
+  type    = bool
 }
 
 variable "proxy_iam_auth" {
   description = "One of REQUIRED or DISABLED"
-  default = "REQUIRED"
+  default     = "REQUIRED"
 }
 
 variable "proxy_secret_arns" {
   description = "List of AWS Secret ARNs containing credentials for use by the proxy."
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "snapshot_identifier" {
@@ -229,6 +241,12 @@ variable "snapshot_identifier" {
 
 variable "kms_key_id" {
   description = "KMS Key used to encrypt RDS instance"
-  type = string
-  default = null
+  type        = string
+  default     = null
+}
+
+variable "auto_minor_version_upgrade" {
+  description = "Whether or not to allow auto minor version upgrades."
+  type        = bool
+  default     = false
 }
