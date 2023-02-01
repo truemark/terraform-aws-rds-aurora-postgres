@@ -27,7 +27,7 @@ variable "master_password" {
 
 variable "master_username" {
   description = "Username for the master user."
-  default     = "root"
+  default     = "postgres"
 }
 
 variable "store_master_password_as_secret" {
