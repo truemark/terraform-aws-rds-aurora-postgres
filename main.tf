@@ -78,6 +78,7 @@ module "db" {
   snapshot_identifier             = var.snapshot_identifier
   kms_key_id                      = var.kms_key_id
   auto_minor_version_upgrade      = var.auto_minor_version_upgrade
+  ca_cert_identifier              = var.ca_cert_identifier
 }
 
 resource "aws_ram_resource_share" "db" {
