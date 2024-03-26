@@ -27,7 +27,7 @@ variable "master_password" {
 
 variable "master_username" {
   description = "Username for the master user."
-  default     = "root"
+  default     = "postgres"
 }
 
 variable "store_master_password_as_secret" {
@@ -255,4 +255,10 @@ variable "ca_cert_identifier" {
   description = "The identifier of the CA certificate for the DB instance"
   type        = string
   default     = "rds-ca-rsa2048-g1"
+}
+
+variable "create_db_subnet_group" {
+  description = "Determines whether to create the database subnet group or use existing"
+  type        = bool
+  default     = true
 }
