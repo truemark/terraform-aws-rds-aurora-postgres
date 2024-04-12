@@ -3,6 +3,30 @@ locals {
     for n in range(1, var.replica_count + 2) :
     n => {}
   }
+  port = 5432
+  tags = merge(var.tags,
+    {
+      "automation:component-id"     = "rds-aurora-postgres",
+      "automation:component-url"    = "https://registry.terraform.io/modules/truemark/rds-aurora-postgres/aws/latest",
+      "automation:component-vendor" = "TrueMark",
+      "backup:policy"               = "default-week",
+  })
+  # security_group_rules = [
+    # {
+      # type        = "ingress"
+      # from_port   = 5432
+      # to_port     = 5432
+      # protocol    = "tcp"
+      # cidr_blocks = var.ingress_cidrs
+    # },
+    # {
+      # type        = "egress"
+      # from_port   = 0
+      # to_port     = 0
+      # protocol    = "-1"
+      # cidr_blocks = var.egress_cidrs
+    # }
+  # ]
 }
 
 resource "aws_db_parameter_group" "db" {
@@ -37,49 +61,69 @@ resource "aws_rds_cluster_parameter_group" "db" {
   tags = merge(var.tags, var.rds_cluster_parameter_group_tags)
 }
 
+resource "aws_security_group" "db" {
+  count  = var.create_cluster ? 1 : 0
+  name   = var.name
+  vpc_id = var.vpc_id
+  tags   = var.tags
+
+  ingress {
+    from_port   = local.port
+    to_port     = local.port
+    protocol    = "tcp"
+    cidr_blocks = var.ingress_cidrs
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = var.egress_cidrs
+  }
+}
+
 module "db" {
   # https://registry.terraform.io/modules/terraform-aws-modules/rds-aurora/aws/latest
-  source         = "terraform-aws-modules/rds-aurora/aws"
-  version        = "9.3.1"
-  name           = var.name
-  database_name  = var.database_name
-  engine         = "aurora-postgresql"
-  engine_version = var.engine_version
-  engine_mode    = "provisioned"
-  instance_class = var.instance_class
-  instances      = local.instances
+  source  = "terraform-aws-modules/rds-aurora/aws"
+  version = "9.3.1"
 
-  // TODO Add autoscaling parameters back
-
-  vpc_id                          = var.vpc_id
-  subnets                         = var.subnets
-  monitoring_interval             = 60
-  enabled_cloudwatch_logs_exports = ["postgresql"]
   apply_immediately               = var.apply_immediately
-  skip_final_snapshot             = var.skip_final_snapshot
-  storage_encrypted               = true
+  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
+  backup_retention_period         = var.backup_retention_period
+  ca_cert_identifier              = var.ca_cert_identifier
+  cluster_tags                    = var.cluster_tags
+  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
+  create_db_subnet_group          = var.create_db_subnet_group
+  #create_security_group           = var.create_security_group
+  database_name                   = var.database_name
   db_parameter_group_name         = var.db_parameter_group_name == null ? element(aws_db_parameter_group.db.*.name, 1) : var.db_parameter_group_name
   db_cluster_parameter_group_name = var.rds_cluster_parameter_group_name == null ? element(aws_rds_cluster_parameter_group.db.*.name, 1) : var.rds_cluster_parameter_group_name
-  #allowed_cidr_blocks             = var.allowed_cidr_blocks
-  backup_retention_period         = var.backup_retention_period
+  deletion_protection             = var.deletion_protection
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+  engine                          = "aurora-postgresql"
+  engine_mode                     = "provisioned"
+  engine_version                  = var.engine_version
+  instances                       = local.instances
+  instance_class                  = var.instance_class
+  kms_key_id                      = var.kms_key_id
+  manage_master_user_password     = var.manage_master_user_password
+  master_password                 = var.manage_master_user_password ? null : random_password.root_password.result
+  master_username                 = var.master_username
+  monitoring_interval             = 60
+  name                            = var.name
   performance_insights_enabled    = var.performance_insights_enabled
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   preferred_backup_window         = var.preferred_backup_window
   preferred_maintenance_window    = var.preferred_maintenance_window
-  deletion_protection             = var.deletion_protection
-  tags                            = var.tags
-  cluster_tags                    = var.cluster_tags
-  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
+  #security_group_rules            = local.security_group_rules
   security_group_tags             = var.security_group_tags
-  #create_random_password          = var.master_password == null
-  master_password                 = var.master_password
-  master_username                 = var.master_username
-  create_security_group           = var.create_security_group
+  skip_final_snapshot             = var.skip_final_snapshot
   snapshot_identifier             = var.snapshot_identifier
-  kms_key_id                      = var.kms_key_id
-  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
-  ca_cert_identifier              = var.ca_cert_identifier
-  create_db_subnet_group          = var.create_db_subnet_group
+  storage_encrypted               = true
+  subnets                         = var.subnets
+  tags                            = var.tags
+  vpc_id                          = var.vpc_id
+  vpc_security_group_ids          = [join("", aws_security_group.db.*.id)]
 }
 
 resource "aws_ram_resource_share" "db" {
@@ -90,14 +134,14 @@ resource "aws_ram_resource_share" "db" {
 }
 
 resource "aws_secretsmanager_secret" "db" {
-  count       = var.create_cluster && var.store_master_password_as_secret ? 1 : 0
+  count       = var.create_cluster && var.manage_master_user_password ? 0 : 1
   name_prefix = var.master_password_secret_name_prefix == null ? "database/${var.name}/master-" : var.master_password_secret_name_prefix
   description = "Master password for ${var.name}"
   tags        = merge(var.tags, var.password_secret_tags)
 }
 
 resource "aws_secretsmanager_secret_version" "db" {
-  count     = var.create_cluster && var.store_master_password_as_secret ? 1 : 0
+  count     = var.create_cluster && var.manage_master_user_password ? 0 : 1
   secret_id = aws_secretsmanager_secret.db[count.index].id
   secret_string = jsonencode({
     host     = module.db.cluster_endpoint
@@ -106,6 +150,14 @@ resource "aws_secretsmanager_secret_version" "db" {
     username = module.db.cluster_master_username
     password = module.db.cluster_master_password
   })
+}
+
+resource "random_password" "root_password" {
+  length      = 16
+  special     = false
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 0
 }
 
 module "proxy" {
@@ -125,23 +177,3 @@ module "proxy" {
   db_cluster_identifier = module.db.cluster_id
   rds_security_group_id = module.db.security_group_id
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
