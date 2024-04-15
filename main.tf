@@ -3,7 +3,6 @@ locals {
     for n in range(1, var.replica_count + 2) :
     n => {}
   }
-  port = 5432
   tags = merge(var.tags,
     {
       "automation:component-id"     = "rds-aurora-postgres",
@@ -11,22 +10,23 @@ locals {
       "automation:component-vendor" = "TrueMark",
       "backup:policy"               = "default-week",
   })
-  # security_group_rules = [
-    # {
-      # type        = "ingress"
-      # from_port   = 5432
-      # to_port     = 5432
-      # protocol    = "tcp"
-      # cidr_blocks = var.ingress_cidrs
-    # },
-    # {
-      # type        = "egress"
-      # from_port   = 0
-      # to_port     = 0
-      # protocol    = "-1"
-      # cidr_blocks = var.egress_cidrs
-    # }
-  # ]
+
+  security_group_rules = [
+    {
+      type        = "ingress"
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = var.ingress_cidrs
+    },
+    {
+      type        = "egress"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = var.egress_cidrs
+    }
+  ]
 }
 
 resource "aws_db_parameter_group" "db" {
@@ -60,28 +60,6 @@ resource "aws_rds_cluster_parameter_group" "db" {
   }
   tags = merge(var.tags, var.rds_cluster_parameter_group_tags)
 }
-
-resource "aws_security_group" "db" {
-  count  = var.create_cluster ? 1 : 0
-  name   = var.name
-  vpc_id = var.vpc_id
-  tags   = var.tags
-
-  ingress {
-    from_port   = local.port
-    to_port     = local.port
-    protocol    = "tcp"
-    cidr_blocks = var.ingress_cidrs
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = var.egress_cidrs
-  }
-}
-
 module "db" {
   # https://registry.terraform.io/modules/terraform-aws-modules/rds-aurora/aws/latest
   source  = "terraform-aws-modules/rds-aurora/aws"
@@ -94,7 +72,7 @@ module "db" {
   cluster_tags                    = var.cluster_tags
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
   create_db_subnet_group          = var.create_db_subnet_group
-  #create_security_group           = var.create_security_group
+  create_security_group           = var.create_security_group
   database_name                   = var.database_name
   db_parameter_group_name         = var.db_parameter_group_name == null ? element(aws_db_parameter_group.db.*.name, 1) : var.db_parameter_group_name
   db_cluster_parameter_group_name = var.rds_cluster_parameter_group_name == null ? element(aws_rds_cluster_parameter_group.db.*.name, 1) : var.rds_cluster_parameter_group_name
@@ -115,7 +93,7 @@ module "db" {
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   preferred_backup_window         = var.preferred_backup_window
   preferred_maintenance_window    = var.preferred_maintenance_window
-  #security_group_rules            = local.security_group_rules
+  security_group_rules            = local.security_group_rules
   security_group_tags             = var.security_group_tags
   skip_final_snapshot             = var.skip_final_snapshot
   snapshot_identifier             = var.snapshot_identifier
@@ -123,7 +101,6 @@ module "db" {
   subnets                         = var.subnets
   tags                            = var.tags
   vpc_id                          = var.vpc_id
-  vpc_security_group_ids          = [join("", aws_security_group.db.*.id)]
 }
 
 resource "aws_ram_resource_share" "db" {
