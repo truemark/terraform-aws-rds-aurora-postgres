@@ -27,7 +27,7 @@ variable "copy_tags_to_snapshot" {
   description = "Copy all cluster tags to snapshots"
   default     = false
 }
-variable "create_cluster" {
+variable "create" {
   description = "True if the cluster should be created"
   default     = true
 }

@@ -30,7 +30,7 @@ locals {
 }
 
 resource "aws_db_parameter_group" "db" {
-  count       = var.create_cluster && var.db_parameter_group_name == null ? 1 : 0
+  count       = var.create && var.db_parameter_group_name == null ? 1 : 0
   name        = var.name
   family      = var.family
   description = "Parameter group for ${var.name}"
@@ -46,7 +46,7 @@ resource "aws_db_parameter_group" "db" {
 }
 
 resource "aws_rds_cluster_parameter_group" "db" {
-  count       = var.create_cluster && var.rds_cluster_parameter_group_name == null ? 1 : 0
+  count       = var.create && var.rds_cluster_parameter_group_name == null ? 1 : 0
   name        = var.name
   family      = var.family
   description = "Cluster parameter group for ${var.name}"
@@ -85,7 +85,7 @@ module "db" {
   instance_class                  = var.instance_class
   kms_key_id                      = var.kms_key_id
   manage_master_user_password     = var.manage_master_user_password
-  master_password                 = var.manage_master_user_password ? null : random_password.root_password.result
+  master_password                 = var.manage_master_user_password ? null : random_password.master_password.result
   master_username                 = var.master_username
   monitoring_interval             = 60
   name                            = var.name
@@ -104,21 +104,22 @@ module "db" {
 }
 
 resource "aws_ram_resource_share" "db" {
-  count                     = var.create_cluster && var.share ? 1 : 0
+  count                     = var.create && var.share ? 1 : 0
   name                      = "${var.name}-rds"
   allow_external_principals = false
   tags                      = merge(var.tags, var.share_tags)
 }
 
 resource "aws_secretsmanager_secret" "db" {
-  count       = var.create_cluster && var.manage_master_user_password ? 0 : 1
+  count       = var.create && var.manage_master_user_password ? 0 : 1
   name_prefix = var.master_password_secret_name_prefix == null ? "database/${var.name}/master-" : var.master_password_secret_name_prefix
   description = "Master password for ${var.name}"
   tags        = merge(var.tags, var.password_secret_tags)
+
 }
 
 resource "aws_secretsmanager_secret_version" "db" {
-  count     = var.create_cluster && var.manage_master_user_password ? 0 : 1
+  count     = var.create && var.manage_master_user_password ? 0 : 1
   secret_id = aws_secretsmanager_secret.db[count.index].id
   secret_string = jsonencode({
     host     = module.db.cluster_endpoint
@@ -127,9 +128,10 @@ resource "aws_secretsmanager_secret_version" "db" {
     username = module.db.cluster_master_username
     password = module.db.cluster_master_password
   })
+
 }
 
-resource "random_password" "root_password" {
+resource "random_password" "master_password" {
   length      = 16
   special     = false
   min_upper   = 1
@@ -138,7 +140,7 @@ resource "random_password" "root_password" {
 }
 
 module "proxy" {
-  count                 = var.create_cluster && var.create_proxy ? 1 : 0
+  count                 = var.create && var.create_proxy ? 1 : 0
   source                = "truemark/rds-proxy/aws"
   version               = "0.0.1"
   create_proxy          = var.create_proxy
