@@ -235,11 +235,6 @@ variable "snapshot_identifier" {
   type        = string
   default     = null
 }
-variable "store_master_password_as_secret" {
-  description = "Set to true to allow self-management of the master user password in Secrets Manager"
-  default     = false
-  type        = bool
-}
 variable "subnets" {
   description = "List of subnet IDs to use"
   type        = list(string)
