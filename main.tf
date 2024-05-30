@@ -85,7 +85,7 @@ module "db" {
   instance_class                  = var.instance_class
   kms_key_id                      = var.kms_key_id
   manage_master_user_password     = var.manage_master_user_password
-  master_password                 = var.manage_master_user_password ? null : random_password.master_password.result
+  master_password                 = var.manage_master_user_password ? null : (var.master_password != null ? var.master_password : random_password.master_password.result)
   master_username                 = var.master_username
   monitoring_interval             = 60
   name                            = var.name
