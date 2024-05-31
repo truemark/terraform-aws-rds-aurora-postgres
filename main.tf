@@ -63,7 +63,7 @@ resource "aws_rds_cluster_parameter_group" "db" {
 module "db" {
   # https://registry.terraform.io/modules/terraform-aws-modules/rds-aurora/aws/latest
   source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "9.3.1"
+  version = "9.4.0"
 
   apply_immediately                      = var.apply_immediately
   auto_minor_version_upgrade             = var.auto_minor_version_upgrade
