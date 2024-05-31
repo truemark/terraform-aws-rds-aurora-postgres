@@ -52,6 +52,12 @@ variable "database_name" {
 }
 variable "db_parameter_group_name" {
   description = "Optional aws_db_parameter_group name. Providing this will prevent the creation of the aws_db_parameter_group resource."
+  type        = string
+  default     = null
+}
+variable "db_parameter_group_description" {
+  description = "Description for the parameter group"
+  type        = string
   default     = null
 }
 variable "db_parameter_group_tags" {
@@ -186,6 +192,12 @@ variable "random_password_length" {
 }
 variable "rds_cluster_parameter_group_name" {
   description = "Optional aws_rds_cluster_parameter_group name. Providing this will prevent the creation of the aws_rds_cluster_parameter_group resource."
+  type        = string
+  default     = null
+}
+variable "rds_cluster_parameter_group_description" {
+  description = "Description for the parameter group"
+  type        = string
   default     = null
 }
 variable "rds_cluster_parameter_group_tags" {
@@ -215,6 +227,11 @@ variable "security_group_tags" {
   description = "Additional tags for the security group"
   type        = map(string)
   default     = {}
+}
+variable "security_group_description" {
+  description = "Description for the security group"
+  type        = string
+  default     = null
 }
 variable "share" {
   default = false

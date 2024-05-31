@@ -65,42 +65,45 @@ module "db" {
   source  = "terraform-aws-modules/rds-aurora/aws"
   version = "9.3.1"
 
-  apply_immediately               = var.apply_immediately
-  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
-  backup_retention_period         = var.backup_retention_period
-  ca_cert_identifier              = var.ca_cert_identifier
-  cluster_tags                    = var.cluster_tags
-  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
-  create_db_subnet_group          = var.create_db_subnet_group
-  create_security_group           = var.create_security_group
-  database_name                   = var.database_name
-  db_parameter_group_name         = var.db_parameter_group_name == null ? element(aws_db_parameter_group.db.*.name, 1) : var.db_parameter_group_name
-  db_cluster_parameter_group_name = var.rds_cluster_parameter_group_name == null ? element(aws_rds_cluster_parameter_group.db.*.name, 1) : var.rds_cluster_parameter_group_name
-  deletion_protection             = var.deletion_protection
-  enabled_cloudwatch_logs_exports = ["postgresql"]
-  engine                          = "aurora-postgresql"
-  engine_mode                     = "provisioned"
-  engine_version                  = var.engine_version
-  instances                       = local.instances
-  instance_class                  = var.instance_class
-  kms_key_id                      = var.kms_key_id
-  manage_master_user_password     = var.manage_master_user_password
-  master_password                 = var.manage_master_user_password ? null : (var.master_password != null ? var.master_password : random_password.master_password.result)
-  master_username                 = var.master_username
-  monitoring_interval             = 60
-  name                            = var.name
-  performance_insights_enabled    = var.performance_insights_enabled
-  performance_insights_kms_key_id = var.performance_insights_kms_key_id
-  preferred_backup_window         = var.preferred_backup_window
-  preferred_maintenance_window    = var.preferred_maintenance_window
-  security_group_rules            = local.security_group_rules
-  security_group_tags             = var.security_group_tags
-  skip_final_snapshot             = var.skip_final_snapshot
-  snapshot_identifier             = var.snapshot_identifier
-  storage_encrypted               = true
-  subnets                         = var.subnets
-  tags                            = var.tags
-  vpc_id                          = var.vpc_id
+  apply_immediately                      = var.apply_immediately
+  auto_minor_version_upgrade             = var.auto_minor_version_upgrade
+  backup_retention_period                = var.backup_retention_period
+  ca_cert_identifier                     = var.ca_cert_identifier
+  cluster_tags                           = var.cluster_tags
+  copy_tags_to_snapshot                  = var.copy_tags_to_snapshot
+  create_db_subnet_group                 = var.create_db_subnet_group
+  create_security_group                  = var.create_security_group
+  database_name                          = var.database_name
+  db_parameter_group_name                = var.db_parameter_group_name == null ? element(aws_db_parameter_group.db.*.name, 1) : var.db_parameter_group_name
+  db_parameter_group_description         = var.db_parameter_group_description
+  db_cluster_parameter_group_name        = var.rds_cluster_parameter_group_name == null ? element(aws_rds_cluster_parameter_group.db.*.name, 1) : var.rds_cluster_parameter_group_name
+  db_cluster_parameter_group_description = var.rds_cluster_parameter_group_description
+  deletion_protection                    = var.deletion_protection
+  enabled_cloudwatch_logs_exports        = ["postgresql"]
+  engine                                 = "aurora-postgresql"
+  engine_mode                            = "provisioned"
+  engine_version                         = var.engine_version
+  instances                              = local.instances
+  instance_class                         = var.instance_class
+  kms_key_id                             = var.kms_key_id
+  manage_master_user_password            = var.manage_master_user_password
+  master_password                        = var.manage_master_user_password ? null : (var.master_password != null ? var.master_password : random_password.master_password.result)
+  master_username                        = var.master_username
+  monitoring_interval                    = 60
+  name                                   = var.name
+  performance_insights_enabled           = var.performance_insights_enabled
+  performance_insights_kms_key_id        = var.performance_insights_kms_key_id
+  preferred_backup_window                = var.preferred_backup_window
+  preferred_maintenance_window           = var.preferred_maintenance_window
+  security_group_rules                   = local.security_group_rules
+  security_group_tags                    = var.security_group_tags
+  security_group_description             = var.security_group_description
+  skip_final_snapshot                    = var.skip_final_snapshot
+  snapshot_identifier                    = var.snapshot_identifier
+  storage_encrypted                      = true
+  subnets                                = var.subnets
+  tags                                   = var.tags
+  vpc_id                                 = var.vpc_id
 }
 
 resource "aws_ram_resource_share" "db" {
