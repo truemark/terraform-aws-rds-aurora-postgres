@@ -15,7 +15,7 @@ permissions:
   id-token: write
 jobs:
   publish:
-    uses: truemark/github-workflows/.github/workflows/terraform-module.yml@main
+    uses: truemark/github-workflows/.github/workflows/terraform-module.yml@develop
     secrets:
       app-id: ${{ secrets.RELEASE_BOT_ID }}
       private-key: ${{ secrets.RELEASE_BOT_KEY }}
