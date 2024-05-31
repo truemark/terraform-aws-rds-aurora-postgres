@@ -134,12 +134,13 @@ resource "aws_secretsmanager_secret_version" "db" {
 
 }
 
+# TODO We should be using our truemark/rds-secret/aws module
 resource "random_password" "master_password" {
-  length      = 16
-  special     = false
-  min_upper   = 1
-  min_lower   = 1
-  min_numeric = 0
+  length      = var.master_password_length
+  special     = var.master_password_special
+  min_upper   = var.master_password_min_upper
+  min_lower   = var.master_password_min_lower
+  min_numeric = var.master_password_min_numeric
 }
 
 module "proxy" {
