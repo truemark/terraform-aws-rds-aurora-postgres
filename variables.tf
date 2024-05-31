@@ -270,3 +270,28 @@ variable "vpc_security_group_ids" {
   type        = list(string)
   default     = []
 }
+variable "master_password_length" {
+  description = "The length of the password to generate for the master user."
+  type        = number
+  default     = 16
+}
+variable "master_password_special" {
+  description = "Whether or not to include special characters in the master password."
+  type        = bool
+  default     = false
+}
+variable "master_password_min_upper" {
+  description = "The minimum number of uppercase characters in the master password."
+  type        = number
+  default     = 1
+}
+variable "master_password_min_lower" {
+  description = "The minimum number of lowercase characters in the master password."
+  type        = number
+  default     = 1
+}
+variable "master_password_min_numeric" {
+  description = "The minimum number of numeric characters in the master password."
+  type        = number
+  default     = 1
+}
